@@ -1,0 +1,85 @@
+<!-- summary.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary of Expenses</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</head>
+<body>
+    <h1>Summary of Expenses</h1>
+    <form action="/summary" method="POST">
+        <label for="userName">Enter Your Name:</label>
+        <input type="text" id="userName" name="userName" required><br>
+        <button type="submit">Get Summary</button>
+		<button onclick="location.href='/'">Back to Home Page</button>
+    </form>
+
+    <% if (expenses && expenses.length > 0) { %>
+        <h2>Expenses for (converted to USD) <%= userName %>:</h2>
+        <ul>
+            <% expenses.forEach(function(expense) { %>
+                <li><%= expense.itemName %> - $<%= expense.itemCost.toFixed(2) %> (<%= expense.date.toDateString() %>)</li>
+            <% }); %>
+        </ul>
+
+        <div class="chart-container" style="position: relative; height:40vh; width:80vw">
+            <canvas id="expenseChart"></canvas>
+        </div>
+		
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+				var ctx = document.getElementById('expenseChart').getContext('2d');
+				var labels = JSON.parse('<%- labels %>');
+				var data = JSON.parse('<%- data %>');
+				var chart = new Chart(ctx, {
+					type: 'pie',
+					data: {
+						labels: labels,
+						datasets: [{
+							label: 'Expenses by Category',
+							data: data,
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.2)',
+								'rgba(54, 162, 235, 0.2)',
+								'rgba(255, 206, 86, 0.2)',
+								'rgba(75, 192, 192, 0.2)',
+								'rgba(153, 102, 255, 0.2)',
+								'rgba(255, 159, 64, 0.2)',
+								'rgba(199, 199, 199, 0.2)' 
+							],
+							borderColor: [
+								'rgba(255, 99, 132, 1)',
+								'rgba(54, 162, 235, 1)',
+								'rgba(255, 206, 86, 1)',
+								'rgba(75, 192, 192, 1)',
+								'rgba(153, 102, 255, 1)',
+								'rgba(255, 159, 64, 1)',
+								'rgba(199, 199, 199, 1)' 
+							],
+							borderWidth: 1
+						}]
+					},
+					options: {
+						responsive: true,
+						plugins: {
+							legend: {
+								position: 'top',
+							}
+						}
+					}
+				});
+			});
+		</script>
+
+
+    <% } else  { %>
+        <p>No expenses found for <%= userName %>.</p>
+    <% } %>
+
+
+
+    <hr>
+</body>
+</html>
